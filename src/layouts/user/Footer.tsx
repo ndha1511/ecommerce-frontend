@@ -13,7 +13,7 @@ const Footer = () => {
             justifyContent: 'center',
             py: 3,
         }}>
-            <Typography variant="h6" sx={{color: 'white', mb: 2}}>Your Company</Typography>
+            <Typography variant="h6" sx={{color: 'white', mb: 2}}>Hoang Anh Shop</Typography>
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -33,10 +33,10 @@ const Footer = () => {
                     <LinkedIn />
                 </IconButton>
             </Box>
-            <Typography sx={{color: 'white', mb: 1}}>© 2024 Your Company. All rights reserved.</Typography>
-            <Typography sx={{color: 'white', mb: 1}}>Website: <Link href="https://yourcompany.com" sx={{color: 'white'}}>yourcompany.com</Link></Typography>
-            <Typography sx={{color: 'white', mb: 1}}>Contact us: <Link href="mailto:contact@yourcompany.com" sx={{color: 'white'}}>contact@yourcompany.com</Link></Typography>
-            <Typography sx={{color: 'white'}}>Address: 123 Your Street, Your City, Your Country</Typography>
+            <Typography sx={{color: 'white', mb: 1}}>© 2024 Hoang Anh Shop. All rights reserved.</Typography>
+            <Typography sx={{color: 'white', mb: 1}}>Contact me: <Link href="mailto:ndha1115@gmail.com" sx={{color: 'white'}}>ndha1115@gmail.com</Link></Typography>
+            <Typography sx={{color: 'white', mb: 1}}>Mobile phone: <Link href="#" sx={{color: 'white'}}>0981972551</Link></Typography>
+            <Typography sx={{color: 'white'}}>Address: Cu Chi, Ho Chi Minh City, Viet Nam</Typography>
         </GradientBox>
     );
 }

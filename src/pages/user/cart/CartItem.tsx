@@ -78,7 +78,7 @@ const CartItem = ({ item }: Props) => {
                 width: { xs: '100%', sm: 'auto' }
             }}>
                 <Typography variant="body2" color="text.secondary">
-                    Đơn giá: {convertPrice(item.productDetail.product?.price)}
+                    Đơn giá: {item.discountedPrice ? convertPrice(item.discountedPrice) : convertPrice(item.productDetail.product?.price)}
                 </Typography>
             </Box>
             <Box sx={{
@@ -97,7 +97,7 @@ const CartItem = ({ item }: Props) => {
                 width: { xs: '100%', sm: 'auto' }
             }}>
                 <Typography variant="body2" color="text.secondary">
-                    Số tiền: {convertPrice((item.productDetail.product?.price ?? 0) * (item.quantity ?? 0))}
+                    Số tiền: {item.discountedPrice ? convertPrice(item.discountedPrice * (item.quantity ?? 0)) : convertPrice((item.productDetail.product?.price ?? 0) * (item.quantity ?? 0))}
                 </Typography>
             </Box>
             <Box sx={{

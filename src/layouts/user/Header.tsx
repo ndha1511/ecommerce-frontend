@@ -72,6 +72,10 @@ const Header = () => {
         }
     }
 
+    const handleSearch = (name: string) => {
+        window.location.href = `/products?pageNo=1&search=productName:${name}`;
+    }
+
     return (
         <AppBar elevation={0} color="secondary" sx={{
             display: 'flex',
@@ -125,7 +129,7 @@ const Header = () => {
                 })}
             </Box> : <></>}
             {!isMobile && <Box sx={{ flex: 1 }}>
-                <SearchInput placeHolder="search text here" />
+                <SearchInput placeHolder="Tìm kiếm sản phẩm" handleSearch={handleSearch}/>
             </Box>}
             <Box sx={{
                 display: 'flex',
@@ -177,7 +181,8 @@ const Header = () => {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
-                        <MenuItem>Thông tin cá nhân</MenuItem>
+                        <MenuItem onClick={() => navigate('/profile')}>Thông tin cá nhân</MenuItem>
+                        <MenuItem>Đơn hàng của tôi</MenuItem>
                         <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                     </Menu>
                 </> :
@@ -186,6 +191,7 @@ const Header = () => {
                             localStorage.setItem("historyPath", location.pathname);
                             navigate('/auth/login', { state: { from: location.pathname } });
                         }}
+                        size="small"
                     >Đăng nhập</ButtonGradient>}
             </Box>
         </AppBar>

@@ -1,9 +1,9 @@
-import { Box, Button, Container, Rating, Typography } from "@mui/material";
+import { Box, Button, Container, Pagination, Rating, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ProductResponse } from "../../../dtos/responses/product-response";
 import { useParams } from "react-router-dom";
 import { ResponseSuccess } from "../../../dtos/responses/response.success";
-import { getProductById } from "../../../services/product.service";
+import { getPageProducts, getProductById } from "../../../services/product.service";
 import { ProductImageModel } from "../../../models/product-image.model";
 import { ProductModel } from "../../../models/product.model";
 import { ProductDetailModel } from "../../../models/product-detail.model";
@@ -22,7 +22,11 @@ import { CommentResponse } from "../../../dtos/responses/comment-response";
 import CommentView from "../../../components/common/comments/CommentView";
 import { getPageCommentsByProductId } from "../../../services/comment.service";
 import { PageResponse } from "../../../dtos/responses/page-response";
-import { green } from "@mui/material/colors";
+import { green, red } from "@mui/material/colors";
+import { ProductUserResponse } from "../../../dtos/responses/product-user-response";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ListProduct from "./ListProduct";
+import { theme } from "../../../theme";
 
 type SizeColorProps = {
     text: string;
@@ -35,7 +39,7 @@ type SizeColorProps = {
 
 const SizeColorBox = ({ text, changeActive, index, activeIndex, color, sx }: SizeColorProps) => {
     return (
-        <Box 
+        <Box
             sx={{
                 p: 1,
                 display: 'flex',
@@ -72,7 +76,7 @@ const SizeColorBox = ({ text, changeActive, index, activeIndex, color, sx }: Siz
                 height: '100%',
                 color: green[400],
             }}>
-                <DoneIcon fontSize="medium"/>
+                <DoneIcon fontSize="medium" />
             </Box>}
         </Box>
     )
@@ -81,6 +85,8 @@ const SizeColorBox = ({ text, changeActive, index, activeIndex, color, sx }: Siz
 const ProductDetail = () => {
     const { id } = useParams();
     const [product, setProduct] = useState<ProductModel>();
+    const [productUserResponse, setProductUserResponse] = useState<ProductUserResponse>();
+    const [productsUserResponse, setProductsUserResponse] = useState<ProductUserResponse[]>([]);
     const dispatch = useDispatch();
     const [productImages, setProductImages] = useState<ProductImageModel[]>([]);
     const [productDetails, setProductDetails] = useState<ProductDetailModel[]>([]);
@@ -91,6 +97,9 @@ const ProductDetail = () => {
     const [quantityInStock, setQuantityInStock] = useState<number>(0);
     const [buyQuantity, setBuyQuantity] = useState<number>(1);
     const [comments, setComments] = useState<CommentResponse[]>([]);
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [pageNo, setPageNo] = useState<number>(1);
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const changeActiveSize = (index: number) => {
         setActiveSize(index);
@@ -115,16 +124,21 @@ const ProductDetail = () => {
     }, [stompClient]);
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+
+    useEffect(() => {
         (async () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
             try {
-                const response: ResponseSuccess<PageResponse<CommentResponse[]>> = await getPageCommentsByProductId(1, 10, Number(id));
+                const response: ResponseSuccess<PageResponse<CommentResponse[]>> = await getPageCommentsByProductId(pageNo, 5, Number(id));
                 setComments(response.data.data);
+                setTotalPage(response.data.totalPage);
+                setPageNo(response.data.pageNo);
             } catch (error) {
                 console.log(error);
             }
         })();
-    }, []);
+    }, [pageNo]);
 
     const onMessageReceived = (message: Message) => {
         const commentData: CommentResponse = JSON.parse(message.body);
@@ -149,6 +163,22 @@ const ProductDetail = () => {
         (async () => {
             try {
                 const response: ResponseSuccess<ProductResponse> = await getProductById(Number(id));
+                const response2: ResponseSuccess<PageResponse<ProductUserResponse[]>> = await getPageProducts(1, 1, [
+                    {
+                        field: 'id',
+                        operator: '-',
+                        value: id || '',
+                    }
+                ]);
+                const response3: ResponseSuccess<PageResponse<ProductUserResponse[]>> = await getPageProducts(1, 20, [
+                    {
+                        field: 'category.categoryName',
+                        operator: '-',
+                        value: response.data.product.category?.categoryName || '',
+                    }
+                ]);
+                setProductsUserResponse(response3.data.data);
+                setProductUserResponse(response2.data.data[0]);
                 setProduct(response.data.product);
                 setProductImages(response.data.productImages ?? []);
                 setProductDetails(response.data.productDetails ?? []);
@@ -202,7 +232,8 @@ const ProductDetail = () => {
         if (productDetail) {
             addToCartLocalStorage({
                 productDetail: productDetail,
-                quantity: buyQuantity
+                quantity: buyQuantity,
+                discountedPrice: (product?.price || 0) - (productUserResponse?.discountedPrice || 0)
             });
             dispatch(updateCartState());
         }
@@ -212,6 +243,10 @@ const ProductDetail = () => {
     const setBuyQuantityProp = (value: number) => {
         setBuyQuantity(value);
     }
+
+    const handleChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+        setPageNo(value);
+   };
 
     return (
         <Container sx={{
@@ -240,13 +275,18 @@ const ProductDetail = () => {
                         Thương hiệu: {product?.provider?.providerName}
                     </Typography>
                     <Box sx={{ display: 'flex', gap: '25px' }}>
+                        {productUserResponse?.discountedPrice && <>
+                            <Typography sx={{
+                                textDecoration: 'line-through'
+                            }}>
+                                {convertPrice(product?.price)}
+                            </Typography>
+                        </>}
                         <Typography sx={{
-                            textDecoration: 'line-through'
+                            color: productUserResponse?.discountedPrice ? red[400] : '',
+                            fontWeight: productUserResponse?.discountedPrice ? 'bold' : ''
                         }}>
-                            {convertPrice(product?.price)}
-                        </Typography>
-                        <Typography >
-                            {convertPrice(product?.price)}
+                            {productUserResponse?.discountedPrice ? convertPrice((product?.price || 0) - productUserResponse?.discountedPrice) : convertPrice(product?.price)}
                         </Typography>
                     </Box>
                     {product?.avgRating ? <Box sx={{ display: 'flex', gap: '5px' }}>
@@ -265,7 +305,7 @@ const ProductDetail = () => {
                             </Typography>
                             <Box sx={{ display: 'flex', flex: 1, alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                                 {colors.map((color: ColorModel, index: number) => (
-                                    <SizeColorBox sx={{ 
+                                    <SizeColorBox sx={{
                                         border: `3px solid ${index === activeColor ? '#4caf50' : 'white'}`,
                                     }} color={color.colorHex} key={color.id} text={color.colorName ?? ''} changeActive={changeActiveColor}
                                         index={index} activeIndex={activeColor} />
@@ -278,7 +318,7 @@ const ProductDetail = () => {
                             </Typography>
                             <Box sx={{ display: 'flex', flex: 1, alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                                 {sizes.map((size: SizeModel, index: number) => (
-                                    <SizeColorBox sx={{ 
+                                    <SizeColorBox sx={{
                                         border: `3px solid ${index === activeSize ? '#4caf50' : 'white'}`,
                                     }} key={size.id} text={size.numberSize?.toString() ?? size.textSize ?? ''}
                                         changeActive={changeActiveSize} index={index} activeIndex={activeSize} />
@@ -290,7 +330,7 @@ const ProductDetail = () => {
                                 Số lượng trong kho: {quantityInStock?.toString()}
                             </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <Typography>
                                 Số lượng:
                             </Typography>
@@ -302,41 +342,61 @@ const ProductDetail = () => {
                             gap: '20px',
                             alignItems: 'center'
                         }}>
-                            <Button variant="contained" color="warning" onClick={addToCard}>
+                            <Button variant="contained" color="inherit" onClick={addToCard} size="large">
+                                <AddShoppingCartIcon />
                                 Thêm vào giỏ hàng
-                            </Button>
-                            <Button variant="contained" color="success">
-                                Mua ngay
                             </Button>
                         </Box>
                     </Box>
                 </Box>
             </Box>
-            <Typography variant="h6" sx={{mt: 2}}>Mô tả sản phẩm</Typography>
+            <Typography variant="h6" sx={{ mt: 12 }}>Mô tả sản phẩm</Typography>
             <Box>
-                {product?.description}     
+                {product?.description}
             </Box>
-            <Typography variant="h6" sx={{mt: 2}}>Thông tin thương hiệu</Typography>
+            <Typography variant="h6" sx={{ mt: 2 }}>Thông tin thương hiệu</Typography>
             <Box>
-                Thương hiệu: {product?.provider?.providerName}     
-            </Box>
-            <Box>
-                Địa chỉ: {`${product?.provider?.address?.street}, ${product?.provider?.address?.district}, ${product?.provider?.address?.city}`}     
+                Thương hiệu: {product?.provider?.providerName}
             </Box>
             <Box>
-                Email: {product?.provider?.email}     
+                Địa chỉ: {`${product?.provider?.address?.street}, ${product?.provider?.address?.district}, ${product?.provider?.address?.city}`}
             </Box>
             <Box>
-                Số điện thoại: {product?.provider?.phoneNumber}     
+                Email: {product?.provider?.email}
+            </Box>
+            <Box>
+                Số điện thoại: {product?.provider?.phoneNumber}
             </Box>
             <Typography sx={{ mt: 2 }} variant="h6">Đánh giá</Typography>
-            <Box>
-                {comments.map((comment) =>
-                    <CommentView commentResponse={comment} key={comment.comment.id} />
+            <Box sx={{ mt: 1, maxHeight: '1000px', overflow: 'auto' }}>
+                {comments.map((comment) => {
+                    return <Box sx={{ borderBottom: '1px solid grey', p: 3 }}><CommentView commentResponse={comment} key={comment.comment.id} /></Box>
+                }
                 )}
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    mt: 2,
+                    gap: '20px'
+                }}>
+                    <Pagination count={totalPage} page={pageNo} shape="rounded" onChange={handleChange}/>
+                </Box>
             </Box>
             <Typography sx={{ mt: 2 }} variant="h6">Các sản phẩm tương tự</Typography>
-            <Box></Box>
+            <Box>
+                <ListProduct products={productsUserResponse} title="" />
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    mt: 2,
+                    mb: 2,
+                    gap: '20px'
+                }}>
+                    <Button size={isMobile ? "small" : "large"} variant="outlined" color="inherit"
+                        onClick={() => window.location.href =`/products?pageNo=1&search=category.categoryName-${product?.category?.categoryName}`}
+                    >Xem thêm</Button>
+                </Box>
+            </Box>
         </Container>
     )
 }

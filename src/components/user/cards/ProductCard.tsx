@@ -2,6 +2,7 @@ import { Box, Card, CardContent, CardMedia, Rating, Typography, useMediaQuery } 
 import { useNavigate } from "react-router-dom";
 import { ProductUserResponse } from "../../../dtos/responses/product-user-response";
 import { convertPrice } from "../../../utils/convert-price";
+import { red } from "@mui/material/colors";
 
 type Props = {
     product: ProductUserResponse
@@ -60,7 +61,9 @@ const ProductCard = ({ product }: Props) => {
                         {convertPrice(product.product.price)}
                     </Typography>
                     {product.discountedPrice && <Typography sx={{
-                        fontSize: isMobile ? '8px' : '12px'
+                        fontSize: isMobile ? '8px' : '12px',
+                        color: red[400],
+                        fontWeight: 'bold',
                     }}>
                         {convertPrice(product.product.price - product.discountedPrice)}
                     </Typography>}

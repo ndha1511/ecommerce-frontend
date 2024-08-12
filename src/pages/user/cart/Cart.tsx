@@ -16,14 +16,18 @@ const Cart = () => {
     const navigate = useNavigate();
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
-    // Hook để xử lý responsive
+
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         let total = 0;
         cart.forEach((cartItem: CartItemModel) => {
-            total += (cartItem.productDetail.product?.price ?? 0) * (cartItem.quantity ?? 0);
+            let price: number = cartItem.productDetail.product?.price || 0;
+            if(cartItem.discountedPrice) {
+                price = cartItem.discountedPrice;
+            }
+            total += price * (cartItem.quantity ?? 0);
         });
         setTotalMoney(total);
     }, [cart]);

@@ -22,6 +22,8 @@ import AuthLayout from "../layouts/common/AuthLayout";
 import App from "../App";
 import PaymentSuccess from "../pages/user/cart/PaymentSuccess";
 import Order from "../pages/admin/orders/Order";
+import Promotion from "../pages/user/products/Promotion";
+import Profile from "../pages/user/profile/Profile";
 
 
 const adminRoutes = [
@@ -55,7 +57,12 @@ const adminRoutes = [
     },
 ]
 
-const userRoutes = [{}]
+const userRoutes = [
+    {
+        path: '/profile',
+        element: <Profile/>
+    },
+]
 
 const publicRoutes = [
     {
@@ -73,6 +80,11 @@ const publicRoutes = [
     {
         path: '/',
         element: <Navigate to={"/home"}></Navigate>
+    
+    },
+    {
+        path: '/promotions',
+        element: <UserLayout><Promotion/></UserLayout>
     
     },
     {
@@ -122,6 +134,13 @@ const adminRoutesRs = adminRoutes.map((route) => {
 }
 );
 
+const userRoutesRs = userRoutes.map((route) => {
+    return {
+       ...route,
+        element: <ProtectRoutes role={Role.ROLE_USER}><UserLayout>{route.element}</UserLayout></ProtectRoutes>
+    }
+});
+
 const publicRoutesRs = publicRoutes.map((route) => {
     return {
         path: route.path,
@@ -134,7 +153,7 @@ const publicRoutesRs = publicRoutes.map((route) => {
 export const router = createBrowserRouter([
     ...adminRoutesRs,
     ...publicRoutesRs,
-    ...userRoutes,
+    ...userRoutesRs,
     ...authRoutes
     
 ]);
