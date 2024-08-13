@@ -10,10 +10,11 @@ import { updateCartState } from "../../../redux/reducers/cart-reducer";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 type Props = {
-    item: CartItemModel
+    item: CartItemModel,
+    hiddenButton?: boolean
 }
 
-const CartItem = ({ item }: Props) => {
+const CartItem = ({ item, hiddenButton }: Props) => {
     const navigate = useNavigate();
     const [quantity, setQuantity] = useState<number>(item.quantity);
     const dispatch = useDispatch();
@@ -80,8 +81,11 @@ const CartItem = ({ item }: Props) => {
                 <Typography variant="body2" color="text.secondary">
                     Đơn giá: {item.discountedPrice ? convertPrice(item.discountedPrice) : convertPrice(item.productDetail.product?.price)}
                 </Typography>
+                {hiddenButton && <Typography variant="body2" color="text.secondary">
+                    Số lượng: {item.quantity}
+                    </Typography>}
             </Box>
-            <Box sx={{
+            {!hiddenButton && <Box sx={{
                 flex: 1,
                 mb: { xs: 1, sm: 0 },
                 width: { xs: '100%', sm: 'auto' }
@@ -90,7 +94,7 @@ const CartItem = ({ item }: Props) => {
                     Còn {item.productDetail.quantity} sản phẩm
                 </Typography>
                 <QuantityProduct cartItem={item} quantity={quantity} setQuantity={setQuantityProp} maxValue={item.productDetail?.quantity ?? 0} />
-            </Box>
+            </Box>}
             <Box sx={{
                 flex: 1,
                 mb: { xs: 1, sm: 0 },
@@ -100,7 +104,7 @@ const CartItem = ({ item }: Props) => {
                     Số tiền: {item.discountedPrice ? convertPrice(item.discountedPrice * (item.quantity ?? 0)) : convertPrice((item.productDetail.product?.price ?? 0) * (item.quantity ?? 0))}
                 </Typography>
             </Box>
-            <Box sx={{
+            {!hiddenButton && <Box sx={{
                 flexShrink: 0,
                 width: { xs: '100%', sm: 'auto' },
                 display: 'flex',
@@ -126,7 +130,7 @@ const CartItem = ({ item }: Props) => {
                         <DeleteIcon />
                     </Button>
                 </Tooltip>
-            </Box>
+            </Box>}
         </Box>
     )
 }

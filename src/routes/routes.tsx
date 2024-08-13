@@ -22,8 +22,11 @@ import AuthLayout from "../layouts/common/AuthLayout";
 import App from "../App";
 import PaymentSuccess from "../pages/user/cart/PaymentSuccess";
 import Order from "../pages/admin/orders/Order";
+import OrderUser from "../pages/user/order/Order";
 import Promotion from "../pages/user/products/Promotion";
 import Profile from "../pages/user/profile/Profile";
+import OrderDetail from "../pages/user/order/OrderDetail";
+
 
 
 const adminRoutes = [
@@ -61,6 +64,14 @@ const userRoutes = [
     {
         path: '/profile',
         element: <Profile/>
+    },
+    {
+        path: '/orders',
+        element: <OrderUser/>
+    },
+    {
+        path: '/orders/:id',
+        element: <OrderDetail/>
     },
 ]
 

@@ -182,7 +182,7 @@ const Header = () => {
                         }}
                     >
                         <MenuItem onClick={() => navigate('/profile')}>Thông tin cá nhân</MenuItem>
-                        <MenuItem>Đơn hàng của tôi</MenuItem>
+                        <MenuItem onClick={() => navigate('/orders')}>Đơn hàng của tôi</MenuItem>
                         <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                     </Menu>
                 </> :

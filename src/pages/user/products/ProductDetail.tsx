@@ -370,7 +370,7 @@ const ProductDetail = () => {
             <Typography sx={{ mt: 2 }} variant="h6">Đánh giá</Typography>
             <Box sx={{ mt: 1, maxHeight: '1000px', overflow: 'auto' }}>
                 {comments.map((comment) => {
-                    return <Box sx={{ borderBottom: '1px solid grey', p: 3 }}><CommentView commentResponse={comment} key={comment.comment.id} /></Box>
+                    return <Box sx={{ borderBottom: '1px solid grey', p: 3 }} key={comment.comment.id}><CommentView commentResponse={comment} /></Box>
                 }
                 )}
                 <Box sx={{

@@ -1,5 +1,4 @@
 import { Box, Card, CardContent, CardMedia, Rating, Typography, useMediaQuery } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { ProductUserResponse } from "../../../dtos/responses/product-user-response";
 import { convertPrice } from "../../../utils/convert-price";
 import { red } from "@mui/material/colors";
@@ -10,7 +9,6 @@ type Props = {
 
 const ProductCard = ({ product }: Props) => {
     const isMobile: boolean = useMediaQuery('(max-width:600px)');
-    const navigate = useNavigate();
     return (
         <Card sx={{
             width: '100%', position: 'relative', cursor: 'pointer',
@@ -19,7 +17,7 @@ const ProductCard = ({ product }: Props) => {
                 transform: 'scale(1.05)',
                 boxShadow: '0 10px 20px rgba(0, 0, 0, 0.2)',
             }
-        }} onClick={() => navigate('/products/' + product.product.id)}>
+        }} onClick={() => window.location.href = '/products/' + product.product.id}>
             {product.discount && <Box sx={{
                 position: 'absolute',
                 top: 0,

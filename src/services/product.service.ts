@@ -35,6 +35,21 @@ export const updateProduct = async (id: number, productDto: ProductUpdateDto): P
     }
 }
 
+export const updatePatch = async (id: number, fields: any): Promise<ResponseSuccess<ProductModel>> => {
+    try {
+        const response = await requestConfig(
+            `products/${id}`,
+            Method.PATCH,
+            fields,
+            ContentType.JSON,
+            true
+        );
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 
 
 export const getAllProducts = async (): Promise<ResponseSuccess<ProductModel[]>> => {

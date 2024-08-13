@@ -41,7 +41,7 @@ import { createProductDetail } from "../../../services/product-detail.service";
 import ProductImage from "../../../components/admin/products/ProductImage";
 import AlertCustom from "../../../components/common/AlertCustom";
 
-const VisuallyHiddenInput = styled('input')({
+export const VisuallyHiddenInput = styled('input')({
     clipPath: 'inset(50%)',
     height: 1,
     overflow: 'hidden',

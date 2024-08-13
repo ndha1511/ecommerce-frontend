@@ -13,9 +13,10 @@ const Provider = () => {
     const isMobile = useMediaQuery('(max-width:600px)');
     const [providers, setProviders] = useState<ProviderModel[]>([]);
     const [open, setOpen] = useState(false);
-    const handleClose = () => {
-        setOpen(false);
-    }
+    // const handleClose = () => {
+    //     setOpen(false);
+    // }
+    console.log(open);
     useEffect(() => {
         (async () => {
             try {

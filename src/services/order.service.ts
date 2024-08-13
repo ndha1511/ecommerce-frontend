@@ -2,6 +2,7 @@ import requestConfig, { ContentType, Method } from "../configurations/axios.conf
 import { OrderDto } from "../dtos/requests/order.dto";
 import { PageResponse } from "../dtos/responses/page-response";
 import { ResponseSuccess } from "../dtos/responses/response.success";
+import { OrderDetailModel } from "../models/order-detail.model";
 import { OrderModel } from "../models/order.model";
 
 export const createOrder = async (orderDto: OrderDto): Promise<ResponseSuccess<OrderModel>> => {
@@ -60,6 +61,36 @@ export const updateOrder = async (orderId: string, newOrder: any): Promise<Respo
             `orders/${orderId}`,
             Method.PATCH,
             newOrder,
+            ContentType.JSON,
+            true
+        );
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getOrderDetailsByOrderId = async (orderId: string): Promise<ResponseSuccess<OrderDetailModel[]>> => {
+    try {
+        const response = await requestConfig(
+            `order-details/${orderId}`,
+            Method.GET,
+            [],
+            ContentType.JSON,
+            true
+        );
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getOrderById = async (orderId: string): Promise<ResponseSuccess<OrderModel>> => {
+    try {
+        const response = await requestConfig(
+            `orders/${orderId}`,
+            Method.GET,
+            [],
             ContentType.JSON,
             true
         );
