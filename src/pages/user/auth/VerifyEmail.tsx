@@ -27,6 +27,10 @@ const VerifyEmail = () => {
         }
     }, []);
 
+    useEffect(() => {
+        document.title = "Xác thực email";
+    }, []);
+
     const hanlderSubmit = async () => {
         if (!otp) {
             setError("vui lòng nhập mã xác thực");

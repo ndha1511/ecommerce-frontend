@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { ResponseSuccess } from "../../../dtos/responses/response.success";
 import { PageResponse } from "../../../dtos/responses/page-response";
 import { OrderModel } from "../../../models/order.model";
-import { getPageOrders, updateOrder } from "../../../services/order.service";
+import { getPageOrders, updateStatusOrder } from "../../../services/order.service";
 import { Box, Button, FormControl, InputLabel, MenuItem, Pagination, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery } from "@mui/material";
 import { OrderStatus } from "../../../models/enums/order-status.enum";
 import { convertPrice } from "../../../utils/convert-price";
 import SearchInput from "../../../components/common/search-input/SearchInput";
 import { DatePicker } from "@mui/x-date-pickers";
 import AlertCustom from "../../../components/common/AlertCustom";
+import { getOrderStatusText } from "../../user/order/OrderDetail";
 
 
 const Order = () => {
@@ -90,33 +91,27 @@ const Order = () => {
 
     }
 
-    const getOrderStatusText = (orderStatus: OrderStatus) => {
-        switch (orderStatus) {
-            case OrderStatus.PENDING:
-                return "Đang chờ xử lý"
-            case OrderStatus.PROCESSING:
-                return "Đang xử lý"
-            case OrderStatus.SHIPPED:
-                return "Đã giao hàng"
-            case OrderStatus.DELIVERED:
-                return "Đã nhận hàng"
-            case OrderStatus.CANCELLED:
-                return "Đã hủy"
-            default:
-                return ""
-        }
-    }
 
     const handleClick =  async (orderId: string) => {
         try {
-            await updateOrder(orderId, {
-                orderStatus: OrderStatus.SHIPPED
+            await updateStatusOrder(orderId, {
+                status: OrderStatus.SHIPPED
             });
             setReload(prev => !prev);
             setOpenAlert({ show: true, status: 'success', message: 'cập nhật thành công' });
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const handleSearch = async (value: string) => {
+        setSearch([
+            {
+                field: "user.email",
+                value: value,
+                operator: "-"
+            }
+        ])
     }
 
     return (<Box sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
@@ -138,7 +133,7 @@ const Order = () => {
                 flexWrap: "wrap",
                 flexDirection: 'column',
             }}>
-                <SearchInput placeHolder={"Tìm theo email"} />
+                <SearchInput placeHolder={"Tìm theo email"} handleSearch={handleSearch} />
                 <Box sx={{
                     display: 'flex',
                     gap: '15px',
@@ -163,6 +158,8 @@ const Order = () => {
                         name="orderStatus"
                         label="Trạng thái" size={"small"} value={status} onChange={e => changeSelect(e, setStatus)}>
                         <MenuItem value="ALL">--.--</MenuItem>
+                        <MenuItem value="PAID">Đã thanh toán</MenuItem>
+                        <MenuItem value="UNPAID">Chưa thanh toán</MenuItem>
                         <MenuItem value="PENDING">Đang chờ xử lý</MenuItem>
                         <MenuItem value="PROCESSING">Đang vận chuyển</MenuItem>
                         <MenuItem value="SHIPPED">Đã giao hàng</MenuItem>
@@ -177,8 +174,8 @@ const Order = () => {
                     <Select labelId="status"
                         label="Trạng thái" size={"small"} value={sortView} onChange={e => changeSelect(e, setSortView, true)} >
                         <MenuItem value="ALL">--.--</MenuItem>
-                        <MenuItem value="orderDate:asc">Mới nhất</MenuItem>
-                        <MenuItem value="orderDate:desc">Cũ nhất</MenuItem>
+                        <MenuItem value="orderDate:desc">Mới nhất</MenuItem>
+                        <MenuItem value="orderDate:asc">Cũ nhất</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -215,7 +212,7 @@ const Order = () => {
                             <TableCell >{convertPrice(order.discountedAmount)}</TableCell>
 
                             <TableCell align="center">
-                                {order.orderStatus === OrderStatus.PENDING &&
+                                {(order.orderStatus === OrderStatus.PENDING || order.orderStatus === OrderStatus.PAID) &&
                                     <Button color="success" variant="contained" onClick={() => handleClick(order.id)}>Xác nhận</Button>
                                 }
                             </TableCell>

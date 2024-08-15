@@ -25,7 +25,7 @@ import { LoginResponse } from "../../../dtos/responses/login-response";
 import { saveToken } from "../../../services/token.service";
 import { getUserByEmail, saveUserToLocalStorage } from "../../../services/user.service";
 import { UserModel } from "../../../models/user.model";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ButtonGradient from "../../../components/common/ButtonGradient";
 
@@ -70,6 +70,10 @@ const Login = () => {
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
+
+    useEffect(() => {
+        document.title = "Đăng nhập";
+    }, []);
 
     return (
         <Container sx={{

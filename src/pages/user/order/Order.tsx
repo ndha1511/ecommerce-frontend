@@ -1,13 +1,13 @@
 import { Box, Container, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery } from "@mui/material";
 import { OrderModel } from "../../../models/order.model";
 import { convertPrice } from "../../../utils/convert-price";
-import { OrderStatus } from "../../../models/enums/order-status.enum";
 import { useEffect, useState } from "react";
 import { getUserFromLocalStorage } from "../../../services/user.service";
 import { UserModel } from "../../../models/user.model";
 import { ResponseSuccess } from "../../../dtos/responses/response.success";
 import { PageResponse } from "../../../dtos/responses/page-response";
 import { getPageOrders } from "../../../services/order.service";
+import { getOrderStatusText } from "./OrderDetail";
 
 const Order = () => {
     const isMobile = useMediaQuery('(max-width:600px)');
@@ -15,6 +15,10 @@ const Order = () => {
     const [orders, setOrders] = useState<OrderModel[]>([]);
     const [pageNoState, setPageNoState] = useState<number>(1);
     const [totalPage, setTotalPage] = useState<number>(0);
+
+    useEffect(() => {
+        document.title = "Đơn hàng của tôi";
+    }, []);
 
 
     useEffect(() => {
@@ -24,6 +28,9 @@ const Order = () => {
                     field: 'user.email',
                     value: user?.email || "",
                     operator: '-'
+                }], [{
+                    field: 'orderDate',
+                    order: 'desc'
                 }]);
                 setOrders(response.data.data);
                 setTotalPage(response.data.totalPage);
@@ -34,22 +41,7 @@ const Order = () => {
         })();
     }, [pageNoState])
 
-    const getOrderStatusText = (orderStatus: OrderStatus) => {
-        switch (orderStatus) {
-            case OrderStatus.PENDING:
-                return "Đang chờ xử lý"
-            case OrderStatus.PROCESSING:
-                return "Đang xử lý"
-            case OrderStatus.SHIPPED:
-                return "Đã giao hàng"
-            case OrderStatus.DELIVERED:
-                return "Đã nhận hàng"
-            case OrderStatus.CANCELLED:
-                return "Đã hủy"
-            default:
-                return ""
-        }
-    }
+   
 
     const handleNextPage = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPageNoState(value);

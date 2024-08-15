@@ -26,6 +26,10 @@ const Promotion = () => {
      const navigate = useNavigate();
 
      useEffect(() => {
+          document.title = "Sản phẩm khuyến mãi";
+      }, []);
+
+     useEffect(() => {
           const fetchData = async () => {
                window.scrollTo({ top: 0, behavior: 'smooth' });
                const response = await getPromontionProducts(pageNoState, 40, search, sort);

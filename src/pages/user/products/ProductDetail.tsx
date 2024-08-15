@@ -27,6 +27,7 @@ import { ProductUserResponse } from "../../../dtos/responses/product-user-respon
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ListProduct from "./ListProduct";
 import { theme } from "../../../theme";
+import AlertCustom from "../../../components/common/AlertCustom";
 
 type SizeColorProps = {
     text: string;
@@ -100,6 +101,14 @@ const ProductDetail = () => {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [pageNo, setPageNo] = useState<number>(1);
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [openAlert, setOpenAlert] = useState({
+        show: false,
+        status: '',
+        message: ''
+    });
+    const colseAlert = () => {
+        setOpenAlert({ show: false, status: '', message: '' });
+    }
 
     const changeActiveSize = (index: number) => {
         setActiveSize(index);
@@ -211,6 +220,10 @@ const ProductDetail = () => {
     }, []);
 
     useEffect(() => {
+        document.title = product?.productName || "";
+    }, [product]);
+
+    useEffect(() => {
         const productDetailFilter = getProductDetailByColorIdAndSizeId();
         setQuantityInStock(productDetailFilter?.quantity ?? 0);
         setBuyQuantity(1);
@@ -236,6 +249,11 @@ const ProductDetail = () => {
                 discountedPrice: (product?.price || 0) - (productUserResponse?.discountedPrice || 0)
             });
             dispatch(updateCartState());
+            setOpenAlert({
+                show: true,
+                status:'success',
+                message: 'Đã thêm sản phẩm vào giỏ hàng!'
+            })
         }
 
     }
@@ -256,6 +274,7 @@ const ProductDetail = () => {
             pb: 2
 
         }}>
+            {openAlert.show && <AlertCustom alert={openAlert} colseAlert={colseAlert} />}
             <Box sx={{
                 display: 'flex',
                 gap: '50px',

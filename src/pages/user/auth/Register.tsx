@@ -2,7 +2,7 @@ import { Backdrop, Box, CircularProgress, Container, IconButton, InputAdornment,
 import { UserRegisterDto } from "../../../dtos/requests/user-register.dto";
 import * as yup from 'yup';
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { register } from "../../../services/auth.service";
 import { Link, useNavigate } from "react-router-dom";
 import ButtonGradient from "../../../components/common/ButtonGradient";
@@ -63,6 +63,10 @@ const Register = () => {
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
+
+    useEffect(() => {
+        document.title = "Đăng ký";
+    }, []);
     return (
         <Container sx={{
             height: '100vh',

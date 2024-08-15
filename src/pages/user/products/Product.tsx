@@ -26,6 +26,10 @@ const Product = () => {
      const navigate = useNavigate();
 
      useEffect(() => {
+          document.title = "Sản phẩm";
+      }, []);
+
+     useEffect(() => {
           const fetchData = async () => {
                window.scrollTo({ top: 0, behavior: 'smooth' });
                const response = await getPageProducts(pageNoState, 40, search, sort);

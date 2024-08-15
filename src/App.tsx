@@ -9,6 +9,7 @@ import { addNotification, setNotification } from "./redux/reducers/notification-
 import { ResponseSuccess } from "./dtos/responses/response.success";
 import { getNotificationsByUserId } from "./services/notification.service";
 import { PageResponse } from "./dtos/responses/page-response";
+import { MessageResponse } from "./dtos/responses/message-response";
 
 
 const App = ({ children }: { children: ReactNode }) => {
@@ -28,7 +29,6 @@ const App = ({ children }: { children: ReactNode }) => {
     const getNotifications = async (userId: number) => {
         try {
             const response: ResponseSuccess<PageResponse<NotificationModel[]>> = await getNotificationsByUserId(userId);
-            console.log(response.data);
             dispatch(setNotification(response.data.data));
         } catch (error) {
 
@@ -36,7 +36,10 @@ const App = ({ children }: { children: ReactNode }) => {
     }
 
     const onMessageReceived = (message: Message) => {
-        console.log("Received message: ", message.body);
+        const messageResponse: MessageResponse<any> = JSON.parse(message.body);
+        if(messageResponse.type === "notification") {
+            dispatch(addNotification(messageResponse.data));
+        }
     }
 
     const onNotificationReceived = (message: Message) => {

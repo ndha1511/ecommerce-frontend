@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Container, FormControl, IconButton, InputAdornment
 import { Gender, UserModel } from "../../../models/user.model";
 import { changePassword, getUserFromLocalStorage, saveUserToLocalStorage, updateUser, uploadAvt } from "../../../services/user.service";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { VisuallyHiddenInput } from "../../admin/products/CreateProduct";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -54,6 +54,9 @@ const Profile = () => {
             
         }
     }
+    useEffect(() => {
+        document.title = "Tài khoản của tôi";
+    }, []);
 
     const updateInfo = async () => {
         if(name === "") {

@@ -26,6 +26,9 @@ import OrderUser from "../pages/user/order/Order";
 import Promotion from "../pages/user/products/Promotion";
 import Profile from "../pages/user/profile/Profile";
 import OrderDetail from "../pages/user/order/OrderDetail";
+import Payment from "../pages/user/cart/Payment";
+import About from "../pages/user/about/About";
+import Brands from "../pages/user/brands/Brands";
 
 
 
@@ -73,6 +76,10 @@ const userRoutes = [
         path: '/orders/:id',
         element: <OrderDetail/>
     },
+    {
+        path: '/payment',
+        element: <Payment/>
+    },
 ]
 
 const publicRoutes = [
@@ -106,6 +113,14 @@ const publicRoutes = [
     {
         path: '/payment/success',
         element: <UserLayout><PaymentSuccess/></UserLayout>
+    },
+    {
+        path: '/about',
+        element: <UserLayout><About/></UserLayout>
+    },
+    {
+        path: '/brands',
+        element: <UserLayout><Brands/></UserLayout>
     },
 ]
 
@@ -148,7 +163,7 @@ const adminRoutesRs = adminRoutes.map((route) => {
 const userRoutesRs = userRoutes.map((route) => {
     return {
        ...route,
-        element: <ProtectRoutes role={Role.ROLE_USER}><UserLayout>{route.element}</UserLayout></ProtectRoutes>
+        element: <App><ProtectRoutes role={Role.ROLE_USER}><UserLayout>{route.element}</UserLayout></ProtectRoutes></App>
     }
 });
 

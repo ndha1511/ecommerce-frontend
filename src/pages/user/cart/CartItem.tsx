@@ -1,6 +1,5 @@
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { convertPrice } from "../../../utils/convert-price";
-import { useNavigate } from "react-router-dom";
 import { CartItemModel } from "../../../models/cart-item.model";
 import QuantityProduct from "../../../components/user/quantity-product/QuantityProduct";
 import { useState } from "react";
@@ -15,7 +14,6 @@ type Props = {
 }
 
 const CartItem = ({ item, hiddenButton }: Props) => {
-    const navigate = useNavigate();
     const [quantity, setQuantity] = useState<number>(item.quantity);
     const dispatch = useDispatch();
 
@@ -50,7 +48,7 @@ const CartItem = ({ item, hiddenButton }: Props) => {
                 flexDirection: 'column',
                 alignItems: 'flex-start',
             }
-        }} onClick={() => navigate("/products/" + item.productDetail.product?.id)}>
+        }} onClick={() => window.location.href = "/products/" + item.productDetail.product?.id}>
             <Box sx={{
                 flexShrink: 0,
                 mb: { xs: 1, sm: 0 }, // margin-bottom nhỏ hơn trên màn hình nhỏ

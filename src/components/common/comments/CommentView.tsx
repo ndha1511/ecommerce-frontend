@@ -8,9 +8,9 @@ import { MediaType } from "../../../models/enums/media-type.enum";
 const CommentView = ({ commentResponse }: { commentResponse: CommentResponse }) => {
     const getMedia = (media: CommentMediaModel) => {
         if (media.mediaType === MediaType.IMAGE) {
-            return <img key={media.id} src={media.path} alt="Comment Image" width={200} height={200} />;
+            return <img key={media.id} src={media.path} alt="Comment Image" width={150} height={150} />;
         }
-        return <video key={media.id} src={media.path} width={200} height={200} controls></video>
+        return <video key={media.id} src={media.path} width={150} height={150} controls></video>
     }
     return <Box>
         <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>

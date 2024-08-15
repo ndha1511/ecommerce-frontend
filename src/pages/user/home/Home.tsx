@@ -15,6 +15,10 @@ const Home = () => {
      const navigate = useNavigate();
 
      useEffect(() => {
+          document.title = "Hoang Anh shop - Trang chủ";
+      }, []);
+
+     useEffect(() => {
           const fetchData = async () => {
                window.scrollTo({ top: 0, behavior: 'smooth' });
                const response1 = await getPageProducts(1, 20, [], [{

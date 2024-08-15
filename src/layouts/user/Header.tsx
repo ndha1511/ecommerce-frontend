@@ -18,6 +18,7 @@ import { UserModel } from "../../models/user.model";
 import { LoginResponse } from "../../dtos/responses/login-response";
 import { getToken } from "../../services/token.service";
 import { lougout, removeLocalStorage } from "../../services/auth.service";
+import NotificationView from "../../components/common/NotificationView";
 
 
 
@@ -159,9 +160,7 @@ const Header = () => {
                     }}
                 >
                     {notifications.map((notification) =>
-                        <MenuItem key={notification.id}>
-                            {notification.content}
-                        </MenuItem>)}
+                        <NotificationView key={notification.id} notification={notification}/>)}
                 </Menu>
                 {login ? <><Tooltip title={user ? user.name : "tài khoản"}>
                     <IconButtonGradient onClick={handleClickAvatar}>

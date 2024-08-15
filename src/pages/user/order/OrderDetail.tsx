@@ -1,19 +1,50 @@
-import { Box, Button, Container, Typography, Grid } from "@mui/material";
+import { Box, Button, Container, Typography, Grid, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { OrderDetailModel } from "../../../models/order-detail.model";
 import { OrderModel } from "../../../models/order.model";
-import { getOrderById, getOrderDetailsByOrderId } from "../../../services/order.service";
+import { getOrderById, getOrderDetailsByOrderId, updateStatusOrder } from "../../../services/order.service";
 import { convertPrice } from "../../../utils/convert-price";
 import CartItem from "../cart/CartItem";
 import { CartItemModel } from "../../../models/cart-item.model";
 import { OrderStatus } from "../../../models/enums/order-status.enum";
 import { DeliveryMethod, PaymentMethod } from "../../../dtos/requests/order.dto";
+import AlertCustom from "../../../components/common/AlertCustom";
+import { getVnpPaymentUrl } from "../../../services/payment.service";
+import DialogRating from "./DialogRating";
+
+export const getOrderStatusText = (orderStatus: OrderStatus | any) => {
+    switch (orderStatus) {
+        case OrderStatus.PENDING:
+            return "Đang chờ xử lý"
+        case OrderStatus.PROCESSING:
+            return "Đang xử lý"
+        case OrderStatus.SHIPPED:
+            return "Đã giao hàng"
+        case OrderStatus.DELIVERED:
+            return "Đã nhận hàng"
+        case OrderStatus.CANCELLED:
+            return "Đã hủy"
+        case OrderStatus.PAID:
+            return "Đã thanh toán"
+        case OrderStatus.UNPAID:
+            return "Chưa thanh toán"
+        default:
+            return ""
+    }
+}
 
 const OrderDetail = () => {
     const { id } = useParams();
     const [orderDetails, setOrderDetails] = useState<OrderDetailModel[]>([]);
     const [order, setOrder] = useState<OrderModel>();
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+    const [openAlert, setOpenAlert] = useState({
+        show: false,
+        status: '',
+        message: ''
+    });
 
     useEffect(() => {
         if (id) {
@@ -30,22 +61,39 @@ const OrderDetail = () => {
         }
     }, [id]);
 
-    const getOrderStatusText = (orderStatus: OrderStatus | any) => {
-        switch (orderStatus) {
-            case OrderStatus.PENDING:
-                return "Đang chờ xử lý"
-            case OrderStatus.PROCESSING:
-                return "Đang xử lý"
-            case OrderStatus.SHIPPED:
-                return "Đã giao hàng"
-            case OrderStatus.DELIVERED:
-                return "Đã nhận hàng"
-            case OrderStatus.CANCELLED:
-                return "Đã hủy"
-            default:
-                return ""
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const updateOrder = async (orderStatus: OrderStatus, text: string) => {
+        try {
+            const response = await updateStatusOrder(order?.id || "", {
+                status: orderStatus
+            });
+            setOrder(response.data);
+            setOpenAlert({
+                show: true,
+                status: 'success',
+                message: text
+            });
+            handleClose();
+        } catch (error) {
+            setOpenAlert({
+                show: true,
+                status: 'error',
+                message: 'Thất bại'
+            });
+            handleClose();
         }
     }
+
+    
 
     const getDeliveryMethodText = (deliveryMethod: DeliveryMethod | any) => {
         switch (deliveryMethod) {
@@ -68,18 +116,42 @@ const OrderDetail = () => {
     const renderButtonWithOrderStatus = (orderStatus: OrderStatus | any) => {
         switch (orderStatus) {
             case OrderStatus.PENDING:
-                return <Button variant="outlined" color="error">Hủy đơn hàng</Button>
+                return <Button variant="outlined" color="error" onClick={handleClickOpen}>Hủy đơn hàng</Button>
             case OrderStatus.SHIPPED:
-                return <Button variant="outlined" color="success">Đã nhận được hàng</Button>
+                return <Button variant="outlined" color="success" onClick={() => updateOrder(OrderStatus.DELIVERED, "Cập nhật đơn hàng thành công")}>Đã nhận được hàng</Button>
             case OrderStatus.DELIVERED:
-                return <Button variant="outlined" color="warning">Đánh giá sản phẩm</Button>
+                return <Button variant="outlined" color="warning" onClick={() => setOpenDialog(true)}>Đánh giá sản phẩm</Button>
+            case OrderStatus.UNPAID:
+                return <>
+                    <Button variant="outlined" color="error" onClick={handleClickOpen}>Hủy đơn hàng</Button>
+                    <Button variant="outlined" color="info" onClick={paymentOnline}>Thanh toán</Button>
+                </>
             default:
                 return;
         }
     }
 
+    const colseAlert = () => {
+        setOpenAlert({ show: false, status: '', message: '' });
+    }
+
+    const paymentOnline = async () => {
+        const paymentUrl: string = (await getVnpPaymentUrl(order?.id || "", order?.discountedAmount || 0)).data;
+        location.href = paymentUrl;
+    }
+
+    const handleCloseRatingDialog = () => {
+        setOpenDialog(false);
+    }
+
+    useEffect(() => {
+        document.title = "Chi tiết đơn hàng";
+    }, []);
+
     return (
         <Container>
+            {openAlert.show && <AlertCustom alert={openAlert} colseAlert={colseAlert} />}
+            {openDialog && <DialogRating openDialog={openDialog} handleClose={handleCloseRatingDialog} orderDetails={orderDetails}/>}
             <Typography variant="h4" component="h1" align="center" gutterBottom>
                 Chi tiết đơn hàng
             </Typography>
@@ -140,6 +212,27 @@ const OrderDetail = () => {
                     </Grid>
                 </Grid>
             </Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Xác nhận hủy đơn hàng"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn có chắc muốn hủy đơn hàng này ?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="error" variant="outlined">Từ chối</Button>
+                    <Button onClick={() => updateOrder(OrderStatus.CANCELLED, "Hủy đơn hàng thành công")} color="success" variant="outlined">
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

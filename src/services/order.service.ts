@@ -2,6 +2,7 @@ import requestConfig, { ContentType, Method } from "../configurations/axios.conf
 import { OrderDto } from "../dtos/requests/order.dto";
 import { PageResponse } from "../dtos/responses/page-response";
 import { ResponseSuccess } from "../dtos/responses/response.success";
+import { OrderStatus } from "../models/enums/order-status.enum";
 import { OrderDetailModel } from "../models/order-detail.model";
 import { OrderModel } from "../models/order.model";
 
@@ -91,6 +92,23 @@ export const getOrderById = async (orderId: string): Promise<ResponseSuccess<Ord
             `orders/${orderId}`,
             Method.GET,
             [],
+            ContentType.JSON,
+            true
+        );
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const updateStatusOrder = async (orderId: string, orderUpdateDto: {
+    status: OrderStatus
+}): Promise<ResponseSuccess<OrderModel>> => {
+    try {
+        const response = await requestConfig(
+            `orders/${orderId}`,
+            Method.PUT,
+            orderUpdateDto,
             ContentType.JSON,
             true
         );

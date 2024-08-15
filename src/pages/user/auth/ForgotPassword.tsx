@@ -27,6 +27,10 @@ export default function ForgotPassword() {
     const isMobile: boolean = useMediaQuery('(max-width:768px)');
     const isMedium: boolean = useMediaQuery('(max-width:980px)');
 
+    React.useEffect(() => {
+        document.title = "Quên mật khẩu";
+    }, []);
+
     const handleStep1 = async () => {
         try {
             await getVeriryCode(email);
