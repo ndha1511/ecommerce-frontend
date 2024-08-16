@@ -4,7 +4,9 @@ import { UserUpdateDto } from "../dtos/requests/user-update.dto";
 import { LoginResponse } from "../dtos/responses/login-response";
 import { ResponseSuccess } from "../dtos/responses/response.success";
 import { Role, UserModel } from "../models/user.model";
+import { decrypt, encrypt } from "../utils/crypt-data";
 import { saveToken } from "./token.service";
+
 
 export const getUserByEmail = async (email: string): Promise<ResponseSuccess<UserModel>> => {
     try {
@@ -22,26 +24,30 @@ export const getUserByEmail = async (email: string): Promise<ResponseSuccess<Use
 }
 
 export const saveUserToLocalStorage = (user: UserModel) => {
-    localStorage.setItem('user', JSON.stringify(user));
+    const encryptUser: string = encrypt(JSON.stringify(user));
+    localStorage.setItem('user', encryptUser);
 }
 
-export const isLogin = (role?: Role) : boolean => {
-    const user : UserModel | null = getUserFromLocalStorage();
-    if(user) {
+export const isLogin = (role?: Role): boolean => {
+    const user: UserModel | null = getUserFromLocalStorage();
+    if (user) {
         return role ? user.role === role : true;
     }
     return false;
 }
 
-export const getUserFromLocalStorage = () : UserModel | null => { 
-    const userStr : string | null = localStorage.getItem('user');
-    if(userStr) {
-        return JSON.parse(userStr);
+export const getUserFromLocalStorage = (): UserModel | null => {
+    const userStr: string | null = localStorage.getItem('user');
+    if (userStr) {
+        const decryptUser: string = decrypt(userStr);
+        if (decryptUser !== "") {
+            return JSON.parse(decryptUser);
+        }
     }
     return null;
 }
 
-export const updateUser = async (email: string, userUpdateDto: UserUpdateDto) : Promise<ResponseSuccess<UserModel>> => {
+export const updateUser = async (email: string, userUpdateDto: UserUpdateDto): Promise<ResponseSuccess<UserModel>> => {
     try {
         const response = await requestConfig(
             `users/${email}`,
@@ -57,7 +63,7 @@ export const updateUser = async (email: string, userUpdateDto: UserUpdateDto) : 
 }
 
 export const uploadAvt = async (avatar: File): Promise<ResponseSuccess<string>> => {
-    const formData : FormData = new FormData();
+    const formData: FormData = new FormData();
     formData.append('avatar', avatar);
     try {
         const response = await requestConfig(
@@ -73,7 +79,7 @@ export const uploadAvt = async (avatar: File): Promise<ResponseSuccess<string>> 
     }
 }
 
-export const changePassword = async (changePasswordRequest: ChangePasswordRequest) : Promise<ResponseSuccess<LoginResponse>> => {
+export const changePassword = async (changePasswordRequest: ChangePasswordRequest): Promise<ResponseSuccess<LoginResponse>> => {
     try {
         const response = await requestConfig(
             `users/change-password`,
