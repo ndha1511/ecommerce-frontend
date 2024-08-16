@@ -48,7 +48,6 @@ const App = ({ children }: { children: ReactNode }) => {
             dispatch(initRooms(response.data.data));
             dispatch(setPageNo(response.data.pageNo));
             dispatch(setTotalPage(response.data.totalPage));
-            console.log(response.data.data);
             if(response.data.data.length > 0) {
                 dispatch(setCurrentRoom(response.data.data[0]));
             }

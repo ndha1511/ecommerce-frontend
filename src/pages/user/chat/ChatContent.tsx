@@ -18,8 +18,12 @@ import { initRooms, setCurrentRoom, setPageNo, setTotalPage } from "../../../red
 import ImageMessage from "../../../components/common/message/ImageMessage";
 import VideoMessage from "../../../components/common/message/VideoMessage";
 
+type Props = {
+    height: number
+}
 
-const ChatContent = () => {
+
+const ChatContent = ({ height }: Props) => {
 
     const messages: MessageModel[] = useSelector((state: RootState) => state.messsage.items);
     const room: RoomModel | null = useSelector((state: RootState) => state.rooms.currentState);
@@ -61,12 +65,12 @@ const ChatContent = () => {
     }
 
     useEffect(() => {
-        if (messages.length <= 0) {
-            if (room) {
-                getMessage(room.roomId, user.email);
-            }
+
+        if (room) {
+            getMessage(room.roomId, user.email);
         }
-    }, [pageNo]);
+
+    }, [pageNo, room]);
 
     const getMessage = async (roomId: string, email: string) => {
         try {
@@ -97,7 +101,7 @@ const ChatContent = () => {
     }
 
     const handleEnterText = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if(e.key.toUpperCase() === "ENTER" && !e.shiftKey) {
+        if (e.key.toUpperCase() === "ENTER" && !e.shiftKey) {
             sendTextMessage();
             setText("");
         }
@@ -124,9 +128,9 @@ const ChatContent = () => {
             case MessageType.TEXT:
                 return <TextMessage message={message} />
             case MessageType.IMAGE:
-                return <ImageMessage message={message}/>
+                return <ImageMessage message={message} />
             default:
-                return <VideoMessage message={message}/>
+                return <VideoMessage message={message} />
         }
     }
 
@@ -141,7 +145,7 @@ const ChatContent = () => {
             <div
                 id="scrollableDiv"
                 style={{
-                    height: 350,
+                    height: height,
                     overflow: 'auto',
                     display: 'flex',
                     flexDirection: 'column-reverse',

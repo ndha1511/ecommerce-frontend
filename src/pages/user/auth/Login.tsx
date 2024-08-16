@@ -24,7 +24,7 @@ import { ResponseSuccess } from "../../../dtos/responses/response.success";
 import { LoginResponse } from "../../../dtos/responses/login-response";
 import { saveToken } from "../../../services/token.service";
 import { getUserByEmail, saveUserToLocalStorage } from "../../../services/user.service";
-import { UserModel } from "../../../models/user.model";
+import { Role, UserModel } from "../../../models/user.model";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ButtonGradient from "../../../components/common/ButtonGradient";
@@ -55,8 +55,13 @@ const Login = () => {
                 saveToken(response.data);
                 const responseUser: ResponseSuccess<UserModel> = await getUserByEmail(values.email);
                 saveUserToLocalStorage(responseUser.data);
-                const from = location.state?.from || "/home";
-                navigate(from);
+                if (responseUser.data.role === Role.ROLE_ADMIN) {
+                    navigate("/admin/dashboard");
+                } else {
+                    const from = location.state?.from || "/home";
+                    navigate(from);
+                }
+
             } catch (error) {
                 setOpen(false);
                 localStorage.removeItem("token");
@@ -195,7 +200,7 @@ const Login = () => {
                     </Tooltip>
                     <Tooltip title="google">
                         <IconButton onClick={() => loginWithSocial('google')} size="large">
-                            <GoogleIcon fontSize="large"  />
+                            <GoogleIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
                 </Box>

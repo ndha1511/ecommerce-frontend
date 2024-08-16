@@ -29,6 +29,7 @@ import OrderDetail from "../pages/user/order/OrderDetail";
 import Payment from "../pages/user/cart/Payment";
 import About from "../pages/user/about/About";
 import Brands from "../pages/user/brands/Brands";
+import MessageView from "../pages/admin/chat/MessageView";
 
 
 
@@ -61,13 +62,13 @@ const adminRoutes = [
         path: '/admin/order',
         element: <Order/>
     },
+    {
+        path: '/admin/message',
+        element: <MessageView/>
+    },
 ]
 
 const userRoutes = [
-    {
-        path: '/profile',
-        element: <Profile/>
-    },
     {
         path: '/orders',
         element: <OrderUser/>
@@ -86,6 +87,10 @@ const publicRoutes = [
     {
         path: '/home',
         element: <UserLayout><Home/></UserLayout>
+    },
+    {
+        path: '/profile',
+        element: <App><ProtectRoutes><Profile/></ProtectRoutes></App>
     },
     {
         path: '/products/:id',

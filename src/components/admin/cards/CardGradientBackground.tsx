@@ -1,7 +1,7 @@
 import {Box, styled} from "@mui/material";
-import blueBackground from "../../../assets/backgrounds/blue-background.svg";
-import pinkBackground from "../../../assets/backgrounds/pink-background.svg";
-import greenBackground from "../../../assets/backgrounds/green-background.svg";
+import blueBackground from "../../../assets/backgrounds/blue-background.jpg";
+import pinkBackground from "../../../assets/backgrounds/pink-background.jpg";
+import greenBackground from "../../../assets/backgrounds/green-background.png";
 import {ReactNode} from "react";
 
 

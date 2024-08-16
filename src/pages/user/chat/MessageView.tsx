@@ -32,7 +32,7 @@ const MessageView = ({visible, close} : Props) => {
             {/* Header */}
             <ChatHeader close={close}/>
             {/* Content */}
-            <ChatContent/>
+            <ChatContent height={350}/>
         </Box>
     )
 }
